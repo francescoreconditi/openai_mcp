@@ -1,0 +1,37 @@
+[project]
+name = "chatbot-mcp"
+version = "0.1.0"
+description = "Chatbot with OpenAI and MCP integration"
+readme = "README.md"
+authors = [
+    { name = "Francesco Reconditi", email = "52166831+francescoreconditi@users.noreply.github.com" }
+]
+requires-python = ">=3.11"
+dependencies = [
+    "openai>=1.54.0",
+    "fastapi>=0.115.0",
+    "uvicorn>=0.32.0",
+    "streamlit>=1.40.0",
+    "pydantic>=2.10.0",
+    "pydantic-settings>=2.6.0",
+    "python-dotenv>=1.0.0",
+    "httpx>=0.28.0",
+    "mcp>=1.0.0",
+    "websockets>=14.0",
+]
+
+[project.scripts]
+chatbot-mcp = "chatbot_mcp:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.uv]
+dev-dependencies = [
+    "pytest>=8.3.0",
+    "black>=24.10.0",
+    "ruff>=0.8.0",
+    "mypy>=1.13.0",
+    "types-requests>=2.32.0",
+]

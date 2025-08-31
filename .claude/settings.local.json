@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(c:\\temp/**)",
+      "Bash(uv init:*)",
+      "Bash(mkdir:*)",
+      "Bash(dir)",
+      "Bash(uv sync:*)",
+      "Bash(cat:*)",
+      "Bash(move run_*.py scripts/)",
+      "Bash(git remote add:*)",
+      "Bash(git add:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
