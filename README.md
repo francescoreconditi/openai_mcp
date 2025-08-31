@@ -60,7 +60,6 @@ chatbot-mcp/
 
 ```bash
 git clone <repository-url>
-cd chatbot-mcp
 ```
 
 ### 2. Installa uv (se non già installato)
@@ -113,21 +112,18 @@ L'applicazione richiede l'avvio di tre componenti separati. Apri tre terminali d
 
 ### Terminal 1: MCP Server
 ```bash
-cd chatbot-mcp
 uv run python scripts/run_mcp_server.py
 ```
 Il server MCP sarà disponibile su http://localhost:8001
 
 ### Terminal 2: Backend Server
 ```bash
-cd chatbot-mcp
 uv run python scripts/run_backend.py
 ```
 Il backend sarà disponibile su http://localhost:8000
 
 ### Terminal 3: Frontend
 ```bash
-cd chatbot-mcp
 uv run python scripts/run_frontend.py
 ```
 Streamlit aprirà automaticamente il browser su http://localhost:8501
