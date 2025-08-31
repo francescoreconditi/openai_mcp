@@ -34,9 +34,6 @@ chatbot-mcp/
 │   │   ├── server.py         # Server FastAPI originale
 │   │   ├── fastmcp_server.py # Server FastMCP standard
 │   │   └── hybrid_server.py  # Server ibrido (FastMCP + REST)
-│   │
-│   └── chatbot_mcp/          # Package principale
-│       └── __init__.py
 │
 ├── scripts/                  # Script di avvio
 │   ├── run_backend.py        # Script per avviare il backend
