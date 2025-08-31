@@ -131,8 +131,8 @@ uv run python scripts/run_frontend.py
 
 **Opzioni transport disponibili:**
 - `--transport stdio` - Per Claude Desktop (default)
-- `--transport sse` - Server-Sent Events (MCP HTTP standard)
-- `--transport hybrid` - Supporta sia REST che SSE
+- `--transport sse` - Solo SSE, MCP puro (NO REST endpoints)
+- `--transport hybrid` - REST + SSE (RICHIESTO per il backend)
 
 ### 🏛️ Modalità Legacy (Server Originale)
 Per compatibilità con la versione precedente:

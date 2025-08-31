@@ -52,6 +52,8 @@ def main():
     elif args.transport == "sse":
         print(f"Starting MCP server with SSE transport on {args.host}:{args.port}...")
         print("This is MCP standard HTTP streaming transport")
+        print("WARNING: SSE mode does NOT include REST endpoints (/tools, /tools/execute)")
+        print("Use --transport hybrid for both SSE and REST support")
         mcp.run(
             transport="sse",
             host=args.host,
