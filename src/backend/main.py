@@ -81,16 +81,34 @@ async def chat(request: ChatRequest):
             )
             
             if tool_calls:
+                # Add assistant message with tool calls
+                conversation_manager.add_message(
+                    conversation_id,
+                    MessageRole.ASSISTANT,
+                    response_content or "",
+                    metadata={"tool_calls": [{"name": tc.name, "arguments": tc.arguments} for tc in tool_calls]}
+                )
+                
                 for tool_call in tool_calls:
                     tool_response = await mcp_client.execute_tool(tool_call)
                     tools_used.append(tool_call.name)
                     
                     if not tool_response.error:
-                        response_content = await openai_client.handle_tool_response(
-                            messages,
-                            tool_response,
-                            openai_tools
+                        # Add tool response message
+                        conversation_manager.add_message(
+                            conversation_id,
+                            MessageRole.TOOL,
+                            str(tool_response.result),
+                            metadata={"tool_name": tool_response.tool_name}
                         )
+                
+                # Get updated messages and generate final response
+                messages = conversation_manager.get_messages(conversation_id)
+                response_content, _ = await openai_client.generate_response(
+                    messages,
+                    tools=None,
+                    use_tools=False
+                )
         else:
             response_content, _ = await openai_client.generate_response(
                 messages,

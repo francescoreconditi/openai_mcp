@@ -1,3 +1,4 @@
+import json
 import logging
 from typing import List, Optional, Dict, Any
 from openai import AsyncOpenAI
@@ -44,7 +45,7 @@ class OpenAIClient:
                 tool_calls = [
                     ToolCall(
                         name=tc.function.name,
-                        arguments=eval(tc.function.arguments) if tc.function.arguments else {}
+                        arguments=json.loads(tc.function.arguments) if tc.function.arguments else {}
                     )
                     for tc in message.tool_calls
                 ]
@@ -62,24 +63,23 @@ class OpenAIClient:
                 "role": msg.role.value,
                 "content": msg.content
             }
-            if msg.metadata and "name" in msg.metadata:
-                openai_msg["name"] = msg.metadata["name"]
+            
+            if msg.role == MessageRole.TOOL and msg.metadata and "tool_name" in msg.metadata:
+                openai_msg["tool_call_id"] = f"call_{msg.metadata['tool_name']}"
+                openai_msg["name"] = msg.metadata["tool_name"]
+            elif msg.role == MessageRole.ASSISTANT and msg.metadata and "tool_calls" in msg.metadata:
+                openai_msg["tool_calls"] = [
+                    {
+                        "id": f"call_{tc['name']}",
+                        "type": "function",
+                        "function": {
+                            "name": tc["name"],
+                            "arguments": json.dumps(tc["arguments"])
+                        }
+                    }
+                    for tc in msg.metadata["tool_calls"]
+                ]
+            
             openai_messages.append(openai_msg)
         return openai_messages
     
-    async def handle_tool_response(
-        self,
-        messages: List[Message],
-        tool_response: ToolResponse,
-        tools: Optional[List[Dict[str, Any]]] = None
-    ) -> str:
-        messages.append(
-            Message(
-                role=MessageRole.TOOL,
-                content=str(tool_response.result),
-                metadata={"tool_name": tool_response.tool_name}
-            )
-        )
-        
-        response, _ = await self.generate_response(messages, tools, use_tools=False)
-        return response

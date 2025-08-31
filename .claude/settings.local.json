@@ -10,7 +10,10 @@
       "Bash(move run_*.py scripts/)",
       "Bash(git remote add:*)",
       "Bash(git add:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(tasklist:*)",
+      "Bash(powershell:*)",
+      "Bash(taskkill:*)"
     ],
     "deny": [],
     "ask": []
