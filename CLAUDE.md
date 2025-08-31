@@ -17,6 +17,7 @@ cp .env.example .env
 ### Running the Application
 The application requires three separate services to run concurrently:
 
+#### Option 1: Original MCP Server (FastAPI only)
 ```bash
 # Terminal 1: Start MCP Server (port 8001)
 uv run python scripts/run_mcp_server.py
@@ -26,6 +27,27 @@ uv run python scripts/run_backend.py
 
 # Terminal 3: Start Frontend UI (port 8501)
 uv run python scripts/run_frontend.py
+```
+
+#### Option 2: FastMCP Hybrid Server (recommended)
+```bash
+# Terminal 1: Start Hybrid MCP Server (port 8001) - supports both FastMCP and REST API
+uv run python scripts/run_hybrid_mcp.py
+
+# Terminal 2: Start Backend API (port 8000) 
+uv run python scripts/run_backend.py
+
+# Terminal 3: Start Frontend UI (port 8501)
+uv run python scripts/run_frontend.py
+```
+
+#### Option 3: Pure FastMCP Server (for Claude integration only)
+```bash
+# For Claude Desktop integration (stdio transport)
+uv run python scripts/run_fastmcp_server.py
+
+# For HTTP integration (not compatible with current backend)
+uv run python scripts/run_fastmcp_http.py
 ```
 
 ### Development Tools

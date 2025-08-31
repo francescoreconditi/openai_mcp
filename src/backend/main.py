@@ -86,7 +86,7 @@ async def chat(request: ChatRequest):
                     conversation_id,
                     MessageRole.ASSISTANT,
                     response_content or "",
-                    metadata={"tool_calls": [{"name": tc.name, "arguments": tc.arguments} for tc in tool_calls]}
+                    metadata={"tool_calls": [{"id": tc.id, "name": tc.name, "arguments": tc.arguments} for tc in tool_calls]}
                 )
                 
                 for tool_call in tool_calls:
@@ -99,7 +99,7 @@ async def chat(request: ChatRequest):
                             conversation_id,
                             MessageRole.TOOL,
                             str(tool_response.result),
-                            metadata={"tool_name": tool_response.tool_name}
+                            metadata={"tool_call_id": tool_call.id, "tool_name": tool_response.tool_name}
                         )
                 
                 # Get updated messages and generate final response

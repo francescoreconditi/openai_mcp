@@ -13,7 +13,10 @@
       "Bash(git push:*)",
       "Bash(tasklist:*)",
       "Bash(powershell:*)",
-      "Bash(taskkill:*)"
+      "Bash(taskkill:*)",
+      "Bash(uv add:*)",
+      "Bash(uv run:*)",
+      "Bash(del test_fastmcp.py test_fastmcp2.py)"
     ],
     "deny": [],
     "ask": []

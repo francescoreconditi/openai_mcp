@@ -44,6 +44,7 @@ class OpenAIClient:
             if message.tool_calls:
                 tool_calls = [
                     ToolCall(
+                        id=tc.id,
                         name=tc.function.name,
                         arguments=json.loads(tc.function.arguments) if tc.function.arguments else {}
                     )
@@ -64,13 +65,13 @@ class OpenAIClient:
                 "content": msg.content
             }
             
-            if msg.role == MessageRole.TOOL and msg.metadata and "tool_name" in msg.metadata:
-                openai_msg["tool_call_id"] = f"call_{msg.metadata['tool_name']}"
-                openai_msg["name"] = msg.metadata["tool_name"]
+            if msg.role == MessageRole.TOOL and msg.metadata and "tool_call_id" in msg.metadata:
+                openai_msg["tool_call_id"] = msg.metadata["tool_call_id"]
+                openai_msg["name"] = msg.metadata.get("tool_name", "")
             elif msg.role == MessageRole.ASSISTANT and msg.metadata and "tool_calls" in msg.metadata:
                 openai_msg["tool_calls"] = [
                     {
-                        "id": f"call_{tc['name']}",
+                        "id": tc["id"],
                         "type": "function",
                         "function": {
                             "name": tc["name"],

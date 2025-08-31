@@ -33,6 +33,7 @@ class ChatResponse(BaseModel):
 
 
 class ToolCall(BaseModel):
+    id: str = Field(..., description="Tool call ID from OpenAI")
     name: str = Field(..., description="Tool name")
     arguments: Dict[str, Any] = Field(default_factory=dict, description="Tool arguments")
     
