@@ -16,7 +16,9 @@
       "Bash(taskkill:*)",
       "Bash(uv add:*)",
       "Bash(uv run:*)",
-      "Bash(del test_fastmcp.py test_fastmcp2.py)"
+      "Bash(del test_fastmcp.py test_fastmcp2.py)",
+      "Bash(curl:*)",
+      "Bash(uv remove:*)"
     ],
     "deny": [],
     "ask": []

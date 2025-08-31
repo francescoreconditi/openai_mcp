@@ -129,5 +129,6 @@ if __name__ == "__main__":
             port=8001
         )
     else:
-        print("Starting FastMCP server with stdio transport for Claude compatibility...")
+        print("Starting FastMCP server with stdio transport...")
+        print("Compatible with: Claude Desktop, agents library, or any MCP client")
         mcp.run(transport="stdio")

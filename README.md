@@ -114,12 +114,28 @@ TEMPERATURE=0.7
 
 L'applicazione supporta diverse modalità di avvio:
 
-### 🔥 Modalità Raccomandata (Server Universale)
-Server MCP completo che supporta TUTTI i transport standard:
+### 🚀 Modalità Ultra-Semplice (MCP Subprocess) - NUOVA!
+**Solo 2 processi invece di 3!** Il server MCP viene avviato automaticamente come subprocess:
+
+```bash
+# Terminal 1: Backend con MCP integrato (porta 8000)
+uv run python scripts/run_backend_subprocess.py
+
+# Terminal 2: Frontend (porta 8501) 
+uv run python scripts/run_frontend.py
+```
+
+**Vantaggi:**
+- ✅ MCP server avviato automaticamente
+- ✅ Un processo in meno da gestire
+- ✅ Stesso server MCP compatibile con Claude Desktop
+- ✅ Comunicazione diretta via stdio (più efficiente)
+
+### 🔥 Modalità Server Separato (Universale)
+Per controllo completo sui transport MCP:
 
 ```bash
 # Terminal 1: Server Universale MCP (porta 8001)
-# Supporta sia REST API che SSE (MCP standard HTTP streaming)
 uv run python scripts/run_universal_mcp.py --transport hybrid
 
 # Terminal 2: Backend Server (porta 8000)
@@ -129,7 +145,7 @@ uv run python scripts/run_backend.py
 uv run python scripts/run_frontend.py
 ```
 
-**Opzioni transport disponibili:**
+**Opzioni transport:**
 - `--transport stdio` - Per Claude Desktop (default)
 - `--transport sse` - Solo SSE, MCP puro (NO REST endpoints)
 - `--transport hybrid` - REST + SSE (RICHIESTO per il backend)
@@ -157,6 +173,15 @@ uv run python scripts/run_fastmcp_server.py
 ```
 
 > **Nota**: La modalità solo Claude non supporta il backend web. È pensata per integrazione diretta con client MCP come Claude Desktop.
+
+## 📊 Confronto Modalità
+
+| Modalità | Processi | MCP Protocol | OpenAI | Claude | Complessità |
+|----------|----------|--------------|--------|---------|-------------|
+| **Subprocess** | 2 | stdio | ✅ | ✅ | ⭐ Semplice |
+| **Universale** | 3 | stdio/sse/http | ✅ | ✅ | ⭐⭐ Media |
+| **Legacy** | 3 | REST only | ✅ | ❌ | ⭐⭐ Media |
+| **Solo Claude** | 1 | stdio | ❌ | ✅ | ⭐ Semplice |
 
 ## 🤖 Integrazione con Claude Desktop
 
