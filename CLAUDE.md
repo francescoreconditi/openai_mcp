@@ -15,21 +15,46 @@ cp .env.example .env
 ```
 
 ### Running the Application
-The application requires three separate services to run concurrently:
+The application supports multiple execution modes:
 
-#### Option 1: Original MCP Server (FastAPI only)
+#### Option 1: Subprocess Mode (Simplest - RECOMMENDED)
+Only 2 processes needed - MCP server runs as subprocess:
 ```bash
-# Terminal 1: Start MCP Server (port 8001)
-uv run python scripts/run_mcp_server.py
+# Terminal 1: Backend with integrated MCP subprocess (port 8000)
+uv run python scripts/run_backend_subprocess.py
 
-# Terminal 2: Start Backend API (port 8000) 
-uv run python scripts/run_backend.py
-
-# Terminal 3: Start Frontend UI (port 8501)
+# Terminal 2: Frontend UI (port 8501) 
 uv run python scripts/run_frontend.py
 ```
 
-#### Option 2: FastMCP Hybrid Server (recommended)
+#### Option 2: Universal MCP Server (Most Flexible)
+```bash
+# Terminal 1: Universal MCP Server (port 8001) - supports multiple transports
+uv run python scripts/run_universal_mcp.py --transport hybrid
+
+# Terminal 2: Backend API (port 8000)
+uv run python scripts/run_backend.py
+
+# Terminal 3: Frontend UI (port 8501)
+uv run python scripts/run_frontend.py
+```
+
+Transport options for universal server:
+- `--transport stdio` - For Claude Desktop (default)
+- `--transport sse` - Pure MCP with SSE (no REST endpoints)  
+- `--transport hybrid` - REST + SSE (required for backend)
+
+#### Option 3: Backend with Agents
+Enhanced backend with agent capabilities:
+```bash
+# Terminal 1: Backend with agents (port 8000)
+uv run python scripts/run_backend_agents.py
+
+# Terminal 2: Frontend UI (port 8501)
+uv run python scripts/run_frontend.py
+```
+
+#### Option 4: FastMCP Hybrid Server (Legacy)
 ```bash
 # Terminal 1: Start Hybrid MCP Server (port 8001) - supports both FastMCP and REST API
 uv run python scripts/run_hybrid_mcp.py
@@ -41,7 +66,19 @@ uv run python scripts/run_backend.py
 uv run python scripts/run_frontend.py
 ```
 
-#### Option 3: Pure FastMCP Server (for Claude integration only)
+#### Option 5: Original MCP Server (Legacy)
+```bash
+# Terminal 1: Start MCP Server (port 8001)
+uv run python scripts/run_mcp_server.py
+
+# Terminal 2: Start Backend API (port 8000) 
+uv run python scripts/run_backend.py
+
+# Terminal 3: Start Frontend UI (port 8501)
+uv run python scripts/run_frontend.py
+```
+
+#### Option 6: Pure FastMCP Server (for Claude integration only)
 ```bash
 # For Claude Desktop integration (stdio transport)
 uv run python scripts/run_fastmcp_server.py
