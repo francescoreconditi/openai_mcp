@@ -114,12 +114,13 @@ TEMPERATURE=0.7
 
 L'applicazione supporta diverse modalità di avvio:
 
-### 🔥 Modalità Raccomandata (FastMCP Ibrido)
-Per la massima compatibilità con backend e client esterni:
+### 🔥 Modalità Raccomandata (Server Universale)
+Server MCP completo che supporta TUTTI i transport standard:
 
 ```bash
-# Terminal 1: Server Ibrido FastMCP (porta 8001)
-uv run python scripts/run_hybrid_mcp.py
+# Terminal 1: Server Universale MCP (porta 8001)
+# Supporta sia REST API che SSE (MCP standard HTTP streaming)
+uv run python scripts/run_universal_mcp.py --transport hybrid
 
 # Terminal 2: Backend Server (porta 8000)
 uv run python scripts/run_backend.py
@@ -127,6 +128,11 @@ uv run python scripts/run_backend.py
 # Terminal 3: Frontend (porta 8501)
 uv run python scripts/run_frontend.py
 ```
+
+**Opzioni transport disponibili:**
+- `--transport stdio` - Per Claude Desktop (default)
+- `--transport sse` - Server-Sent Events (MCP HTTP standard)
+- `--transport hybrid` - Supporta sia REST che SSE
 
 ### 🏛️ Modalità Legacy (Server Originale)
 Per compatibilità con la versione precedente:
@@ -154,29 +160,34 @@ uv run python scripts/run_fastmcp_server.py
 
 ## 🤖 Integrazione con Claude Desktop
 
-Per utilizzare i tool MCP con Claude Desktop:
+### Opzione 1: Server Universale (stdio)
+```bash
+# Avvia in modalità stdio per Claude
+uv run python scripts/run_universal_mcp.py --transport stdio
+```
 
-1. **Avvia il server FastMCP:**
-   ```bash
-   uv run python scripts/run_fastmcp_server.py
-   ```
+### Opzione 2: Configurazione automatica
+Aggiungi al file di configurazione Claude Desktop:
+```json
+{
+  "mcpServers": {
+    "chatbot-tools": {
+      "command": "uv",
+      "args": ["run", "python", "scripts/run_universal_mcp.py", "--transport", "stdio"],
+      "cwd": "/path/to/chatbot-mcp"
+    }
+  }
+}
+```
 
-2. **Configura Claude Desktop** aggiungendo al file di configurazione:
-   ```json
-   {
-     "mcpServers": {
-       "chatbot-tools": {
-         "command": "uv",
-         "args": ["run", "python", "scripts/run_fastmcp_server.py"],
-         "cwd": "/path/to/chatbot-mcp"
-       }
-     }
-   }
-   ```
+### Opzione 3: HTTP Streaming (futuro)
+Quando Claude Desktop supporterà HTTP streaming:
+```bash
+# Server con SSE (MCP standard HTTP transport)
+uv run python scripts/run_universal_mcp.py --transport sse --port 8001
+```
 
-3. **Riavvia Claude Desktop** per caricare i nuovi tool
-
-I tool saranno disponibili direttamente in Claude senza bisogno del backend web.
+> **Nota**: Attualmente Claude Desktop supporta solo stdio, ma il server è pronto per HTTP streaming quando sarà disponibile.
 
 ## 🔧 Tool MCP Disponibili
 

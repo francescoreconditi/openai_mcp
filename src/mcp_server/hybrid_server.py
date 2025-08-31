@@ -9,6 +9,7 @@ import logging
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
 
 from .fastmcp_server import mcp as fastmcp_server
 from .models import Tool, ExecuteToolRequest, ExecuteToolResponse
@@ -129,6 +130,48 @@ app.add_middleware(
 @app.get("/health")
 async def health_check():
     return {"status": "healthy", "service": "hybrid-mcp-server"}
+
+# MCP Standard SSE endpoint
+@app.get("/sse")
+async def mcp_sse_endpoint():
+    """
+    Standard MCP Server-Sent Events endpoint.
+    This provides MCP protocol over HTTP streaming.
+    """
+    async def event_stream():
+        """Generate SSE events for MCP protocol"""
+        # Initial connection event
+        yield f"data: {{\"type\": \"connection\", \"status\": \"connected\"}}\n\n"
+        
+        # Send available tools
+        tools = await get_fastmcp_tools()
+        tools_data = {
+            "type": "tools",
+            "tools": [
+                {
+                    "name": tool.name,
+                    "description": tool.description,
+                    "parameters": tool.parameters
+                }
+                for tool in tools
+            ]
+        }
+        yield f"data: {json.dumps(tools_data)}\n\n"
+        
+        # Keep connection alive
+        while True:
+            await asyncio.sleep(30)
+            yield f"data: {{\"type\": \"ping\"}}\n\n"
+    
+    return StreamingResponse(
+        event_stream(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no"
+        }
+    )
 
 @app.get("/tools", response_model=List[Tool])
 async def get_tools():
