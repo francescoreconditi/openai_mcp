@@ -18,7 +18,8 @@
       "Bash(uv run:*)",
       "Bash(del test_fastmcp.py test_fastmcp2.py)",
       "Bash(curl:*)",
-      "Bash(uv remove:*)"
+      "Bash(uv remove:*)",
+      "Read(c:\\temp/**)"
     ],
     "deny": [],
     "ask": []

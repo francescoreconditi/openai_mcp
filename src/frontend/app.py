@@ -88,23 +88,43 @@ class ChatbotUI:
             st.divider()
             
             st.caption("Backend Status")
+            backend_online = False
+            backend_info = {}
+            
             try:
                 response = httpx.get(f"{self.backend_url}/health", timeout=2.0)
                 if response.status_code == 200:
                     st.success("Backend: Online ✅")
+                    backend_online = True
+                    backend_info = response.json()
                 else:
                     st.error("Backend: Error ❌")
             except:
                 st.error("Backend: Offline ❌")
             
-            try:
-                response = httpx.get("http://localhost:8001/health", timeout=2.0)
-                if response.status_code == 200:
-                    st.success("MCP Server: Online ✅")
+            # Check MCP status based on backend type
+            if backend_online and backend_info:
+                mcp_integration = backend_info.get("mcp_integration", "")
+                
+                if "subprocess" in mcp_integration:
+                    # Subprocess mode - MCP is integrated in backend
+                    tools_loaded = backend_info.get("tools_loaded", 0)
+                    if tools_loaded > 0:
+                        st.success(f"MCP Server: Integrated ✅ ({tools_loaded} tools)")
+                    else:
+                        st.info("MCP Server: Integrated (loading...)")
                 else:
-                    st.error("MCP Server: Error ❌")
-            except:
-                st.error("MCP Server: Offline ❌")
+                    # Separate server mode - check port 8001
+                    try:
+                        response = httpx.get("http://localhost:8001/health", timeout=2.0)
+                        if response.status_code == 200:
+                            st.success("MCP Server: Online ✅")
+                        else:
+                            st.error("MCP Server: Error ❌")
+                    except:
+                        st.error("MCP Server: Offline ❌")
+            else:
+                st.info("MCP Server: Checking...")
         
         chat_container = st.container()
         
