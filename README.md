@@ -4,9 +4,12 @@ Un'applicazione chatbot moderna costruita con Python, che integra OpenAI per l'i
 
 ## 🚀 Caratteristiche Principali
 
-- **Frontend Moderno**: Interfaccia chat Streamlit con cronologia delle conversazioni
+- **Doppio Frontend**: 
+  - **Streamlit**: Interfaccia rapida per prototipazione
+  - **React**: Interfaccia moderna e responsiva con registrazione vocale
+- **Registrazione Vocale**: Funzionalità di voice input con trascrizione automatica
 - **Backend Scalabile**: Server FastAPI con validazione dati tramite Pydantic
-- **Integrazione OpenAI**: Supporto completo per GPT-4 e altri modelli OpenAI
+- **Integrazione OpenAI**: Supporto completo per GPT-4 e altri modelli OpenAI + Whisper per trascrizione
 - **FastMCP Integration**: Server MCP compatibile con standard FastMCP
 - **Doppia Compatibilità**: Supporta sia il backend interno che client esterni come Claude
 - **Gestione Moderna**: Utilizza `uv` per la gestione delle dipendenze
@@ -25,8 +28,20 @@ chatbot-mcp/
 │   │   ├── conversation_manager.py  # Gestione conversazioni
 │   │   └── main.py           # Entry point FastAPI
 │   │
-│   ├── frontend/             # Frontend Streamlit
-│   │   └── app.py            # Applicazione Streamlit
+│   ├── frontend/             # Frontend Streamlit (legacy)
+│   │   ├── app.py            # Applicazione Streamlit
+│   │   └── audio_transcriber.py  # Gestione trascrizione audio
+│   │
+│   ├── frontend_react/       # Frontend React (moderno)
+│   │   ├── src/
+│   │   │   ├── components/   # Componenti React
+│   │   │   ├── services/     # Servizi API
+│   │   │   ├── styles/       # Stili CSS
+│   │   │   ├── App.js        # Componente principale
+│   │   │   └── index.js      # Entry point
+│   │   ├── public/
+│   │   ├── package.json      # Dipendenze npm
+│   │   └── README.md         # Documentazione React
 │   │
 │   ├── mcp_server/           # MCP Server (compatibile FastMCP)
 │   │   ├── models.py         # Modelli per MCP
@@ -37,11 +52,13 @@ chatbot-mcp/
 │
 ├── scripts/                  # Script di avvio
 │   ├── run_backend.py        # Script per avviare il backend
+│   ├── run_backend_subprocess.py # Backend con MCP integrato
 │   ├── run_mcp_server.py     # Script per avviare MCP server originale
 │   ├── run_hybrid_mcp.py     # Script per server ibrido (RACCOMANDATO)
 │   ├── run_fastmcp_server.py # Script per FastMCP puro (per Claude)
 │   ├── run_fastmcp_http.py   # Script per FastMCP HTTP
-│   └── run_frontend.py       # Script per avviare il frontend
+│   ├── run_frontend.py       # Script per frontend Streamlit
+│   └── run_frontend_react.py # Script per frontend React
 │
 ├── .env                      # File di configurazione (da creare)
 ├── .env.example             # Template configurazione
@@ -55,7 +72,8 @@ chatbot-mcp/
 
 - Python 3.11 o superiore
 - uv (package manager moderno per Python)
-- Account OpenAI con API key
+- Node.js 16+ e npm (per frontend React)
+- Account OpenAI con API key (incluso Whisper per trascrizione vocale)
 - FastMCP per la compatibilità con client MCP standard
 
 ## 🔧 Installazione
@@ -117,12 +135,22 @@ L'applicazione supporta diverse modalità di avvio:
 ### 🚀 Modalità Ultra-Semplice (MCP Subprocess) - NUOVA!
 **Solo 2 processi invece di 3!** Il server MCP viene avviato automaticamente come subprocess:
 
+#### Frontend Streamlit (legacy)
 ```bash
 # Terminal 1: Backend con MCP integrato (porta 8000)
 uv run python scripts/run_backend_subprocess.py
 
-# Terminal 2: Frontend (porta 8501) 
+# Terminal 2: Frontend Streamlit (porta 8501) 
 uv run python scripts/run_frontend.py
+```
+
+#### Frontend React (raccomandato)
+```bash
+# Terminal 1: Backend con MCP integrato (porta 8000)
+uv run python scripts/run_backend_subprocess.py
+
+# Terminal 2: Frontend React (porta 3000)
+uv run python scripts/run_frontend_react.py
 ```
 
 **Vantaggi:**
@@ -130,6 +158,7 @@ uv run python scripts/run_frontend.py
 - ✅ Un processo in meno da gestire
 - ✅ Stesso server MCP compatibile con Claude Desktop
 - ✅ Comunicazione diretta via stdio (più efficiente)
+- ✅ Frontend React con registrazione vocale avanzata
 
 ### 🔥 Modalità Server Separato (Universale)
 Per controllo completo sui transport MCP:
@@ -141,8 +170,9 @@ uv run python scripts/run_universal_mcp.py --transport hybrid
 # Terminal 2: Backend Server (porta 8000)
 uv run python scripts/run_backend.py
 
-# Terminal 3: Frontend (porta 8501)
-uv run python scripts/run_frontend.py
+# Terminal 3: Frontend Streamlit (porta 8501) o React (porta 3000)
+uv run python scripts/run_frontend.py        # Streamlit
+uv run python scripts/run_frontend_react.py  # React
 ```
 
 **Opzioni transport:**
@@ -160,8 +190,9 @@ uv run python scripts/run_mcp_server.py
 # Terminal 2: Backend Server (porta 8000)
 uv run python scripts/run_backend.py
 
-# Terminal 3: Frontend (porta 8501)
-uv run python scripts/run_frontend.py
+# Terminal 3: Frontend Streamlit (porta 8501) o React (porta 3000)
+uv run python scripts/run_frontend.py        # Streamlit  
+uv run python scripts/run_frontend_react.py  # React
 ```
 
 ### 🤖 Modalità Solo Claude (FastMCP Puro)
@@ -176,12 +207,12 @@ uv run python scripts/run_fastmcp_server.py
 
 ## 📊 Confronto Modalità
 
-| Modalità | Processi | MCP Protocol | OpenAI | Claude | Complessità |
-|----------|----------|--------------|--------|---------|-------------|
-| **Subprocess** | 2 | stdio | ✅ | ✅ | ⭐ Semplice |
-| **Universale** | 3 | stdio/sse/http | ✅ | ✅ | ⭐⭐ Media |
-| **Legacy** | 3 | REST only | ✅ | ❌ | ⭐⭐ Media |
-| **Solo Claude** | 1 | stdio | ❌ | ✅ | ⭐ Semplice |
+| Modalità | Processi | MCP Protocol | OpenAI | Claude | Frontend | Complessità |
+|----------|----------|--------------|--------|---------|----------|-------------|
+| **Subprocess** | 2 | stdio | ✅ | ✅ | Streamlit/React | ⭐ Semplice |
+| **Universale** | 3 | stdio/sse/http | ✅ | ✅ | Streamlit/React | ⭐⭐ Media |
+| **Legacy** | 3 | REST only | ✅ | ❌ | Streamlit/React | ⭐⭐ Media |
+| **Solo Claude** | 1 | stdio | ❌ | ✅ | Nessuno | ⭐ Semplice |
 
 ## 🤖 Integrazione con Claude Desktop
 
@@ -272,18 +303,22 @@ uv run mypy src/
 
 1. **Avvia tutti i servizi** seguendo le istruzioni sopra
 
-2. **Apri l'interfaccia Streamlit** nel browser
+2. **Apri l'interfaccia** nel browser:
+   - **Streamlit**: http://localhost:8501
+   - **React**: http://localhost:3000
 
-3. **Scrivi un messaggio** nella chat, ad esempio:
+3. **Scrivi un messaggio o usa la registrazione vocale** nella chat, ad esempio:
    - "Che ore sono?"
    - "Calcola 15 * 23 + 42"
    - "Converti 25 gradi Celsius in Fahrenheit"
    - "Genera un numero casuale tra 1 e 100"
+   - **🎤 Registra vocalmente** il tuo messaggio (solo React)
 
 4. **Osserva la risposta** che includerà:
    - La risposta dell'AI
    - I tool MCP utilizzati (se abilitati)
    - Timestamp delle interazioni
+   - **Trascrizione vocale** se utilizzata
 
 ## ⚙️ Configurazione Avanzata
 
@@ -317,7 +352,14 @@ def my_new_tool(param1: str, param2: int = 42) -> str:
 Modifica `src/mcp_server/tools.py` e aggiungi nuovi metodi nella classe `ToolRegistry`.
 
 ### Personalizzare l'interfaccia
+
+**Frontend Streamlit:**
 Modifica `src/frontend/app.py` per cambiare layout, colori e funzionalità.
+
+**Frontend React:**
+- Componenti: `src/frontend_react/src/components/`
+- Stili: `src/frontend_react/src/styles/`
+- Servizi API: `src/frontend_react/src/services/`
 
 ## 🔍 Troubleshooting
 
