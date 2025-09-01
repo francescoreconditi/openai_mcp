@@ -81,6 +81,61 @@
   gap: 0.5rem;
   padding: 0.5rem 0;
   font-size: 0.9rem;
+  position: relative;
+}
+
+.toggle-tools-btn {
+  margin-left: auto;
+  background: transparent;
+  border: 1px solid #d1d5db;
+  color: #4b5563;
+  font-size: 0.75rem;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.toggle-tools-btn:hover {
+  background: #f3f4f6;
+  border-color: #9ca3af;
+}
+
+.tool-list {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 0.75rem;
+  margin-top: 0.5rem;
+  margin-left: 1.5rem;
+}
+
+.tool-list h4 {
+  font-size: 0.85rem;
+  color: #6b7280;
+  margin: 0 0 0.5rem 0;
+  font-weight: 600;
+}
+
+.tool-list ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.tool-list li {
+  font-size: 0.85rem;
+  color: #374151;
+  padding: 0.25rem 0;
+  padding-left: 1rem;
+  position: relative;
+}
+
+.tool-list li:before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: #9ca3af;
 }
 
 .status-indicator {

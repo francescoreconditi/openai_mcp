@@ -20,7 +20,14 @@
       "Bash(curl:*)",
       "Bash(uv remove:*)",
       "Read(c:\\temp/**)",
-      "Bash(timeout:*)"
+      "Bash(timeout:*)",
+      "Bash(node:*)",
+      "Bash(npm --version)",
+      "Bash(dir srcfrontend_react)",
+      "Bash(dir:*)",
+      "Bash(npm install)",
+      "Read(c:\\temp/**)",
+      "Read(c:\\temp/**)"
     ],
     "deny": [],
     "ask": []

@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import '../styles/Sidebar.css';
 
 function Sidebar({ useTools, onToggleTools, onClearConversation, backendStatus, mcpStatus }) {
+  const [showToolList, setShowToolList] = useState(false);
+  
   return (
     <div className="sidebar">
       <h2>Settings</h2>
@@ -42,7 +44,27 @@ function Sidebar({ useTools, onToggleTools, onClearConversation, backendStatus, 
           <span>
             MCP Server: {mcpStatus.online ? `Online ✅ (${mcpStatus.tools} tools)` : 'Offline ❌'}
           </span>
+          {mcpStatus.online && mcpStatus.tools > 0 && (
+            <button 
+              className="toggle-tools-btn"
+              onClick={() => setShowToolList(!showToolList)}
+              aria-label="Toggle tool list"
+            >
+              {showToolList ? '▼' : '▶'}
+            </button>
+          )}
         </div>
+        
+        {showToolList && mcpStatus.online && mcpStatus.toolList && (
+          <div className="tool-list">
+            <h4>Available Tools:</h4>
+            <ul>
+              {mcpStatus.toolList.map((tool, index) => (
+                <li key={index}>{tool}</li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
       
       <div className="sidebar-footer">

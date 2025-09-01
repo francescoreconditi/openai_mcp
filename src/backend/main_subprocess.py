@@ -346,7 +346,8 @@ async def health_check():
         "status": "healthy",
         "service": "chatbot-backend-subprocess",
         "mcp_integration": "stdio subprocess",
-        "tools_loaded": len(mcp_client.tools)
+        "tools_loaded": len(mcp_client.tools),
+        "tool_names": [tool["name"] for tool in mcp_client.tools] if mcp_client.tools else []
     }
 
 

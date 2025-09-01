@@ -18,24 +18,29 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 def check_node_npm():
     """Check if Node.js and npm are installed."""
     try:
+        # Use shell=True on Windows for better command resolution
+        use_shell = sys.platform == "win32"
+        
         node_version = subprocess.run(
             ["node", "--version"],
             capture_output=True,
             text=True,
-            check=True
+            check=True,
+            shell=use_shell
         )
-        print(f"✓ Node.js found: {node_version.stdout.strip()}")
+        print(f"[OK] Node.js found: {node_version.stdout.strip()}")
         
         npm_version = subprocess.run(
             ["npm", "--version"],
             capture_output=True,
             text=True,
-            check=True
+            check=True,
+            shell=use_shell
         )
-        print(f"✓ npm found: {npm_version.stdout.strip()}")
+        print(f"[OK] npm found: {npm_version.stdout.strip()}")
         return True
-    except (subprocess.CalledProcessError, FileNotFoundError):
-        print("❌ Node.js and npm are required to run the React frontend.")
+    except (subprocess.CalledProcessError, FileNotFoundError) as e:
+        print(f"[ERROR] Node.js and npm are required to run the React frontend. Error: {e}")
         print("Please install Node.js from: https://nodejs.org/")
         return False
 
@@ -44,20 +49,22 @@ def install_dependencies(frontend_dir):
     node_modules = frontend_dir / "node_modules"
     
     if not node_modules.exists():
-        print("📦 Installing npm dependencies...")
+        print("[INFO] Installing npm dependencies...")
         try:
+            use_shell = sys.platform == "win32"
             subprocess.run(
                 ["npm", "install"],
                 cwd=frontend_dir,
-                check=True
+                check=True,
+                shell=use_shell
             )
-            print("✓ Dependencies installed successfully")
+            print("[OK] Dependencies installed successfully")
             return True
         except subprocess.CalledProcessError as e:
-            print(f"❌ Failed to install dependencies: {e}")
+            print(f"[ERROR] Failed to install dependencies: {e}")
             return False
     else:
-        print("✓ Dependencies already installed")
+        print("[OK] Dependencies already installed")
         return True
 
 def start_react_server(frontend_dir):
@@ -76,13 +83,15 @@ def start_react_server(frontend_dir):
     
     try:
         # Run npm start
+        use_shell = sys.platform == "win32"
         process = subprocess.Popen(
             ["npm", "start"],
             cwd=frontend_dir,
-            env=env
+            env=env,
+            shell=use_shell
         )
         
-        print("🚀 React frontend is starting on http://localhost:3000")
+        print("[STARTING] React frontend is starting on http://localhost:3000")
         print("Press Ctrl+C to stop\n")
         
         process.wait()
@@ -91,7 +100,7 @@ def start_react_server(frontend_dir):
         process.terminate()
         process.wait(timeout=5)
     except Exception as e:
-        print(f"❌ Error running React frontend: {e}")
+        print(f"[ERROR] Error running React frontend: {e}")
         return 1
     
     return 0
@@ -104,7 +113,7 @@ def main():
     frontend_dir = project_root / "src" / "frontend_react"
     
     if not frontend_dir.exists():
-        print(f"❌ Frontend directory not found: {frontend_dir}")
+        print(f"[ERROR] Frontend directory not found: {frontend_dir}")
         print("Please ensure the React frontend code is in src/frontend_react/")
         return 1
     

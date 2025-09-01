@@ -13,7 +13,8 @@ function App() {
   const [useTools, setUseTools] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [backendStatus, setBackendStatus] = useState({ online: false, info: {} });
-  const [mcpStatus, setMcpStatus] = useState({ online: false, tools: 0 });
+  const [mcpStatus, setMcpStatus] = useState({ online: false, tools: 0, toolList: [] });
+  const [sidebarVisible, setSidebarVisible] = useState(true);
 
   // Check backend and MCP status
   useEffect(() => {
@@ -27,11 +28,24 @@ function App() {
         if (mcpIntegration.includes('subprocess')) {
           // Subprocess mode - MCP integrated
           const toolsLoaded = status.info.tools_loaded || 0;
-          setMcpStatus({ online: toolsLoaded > 0, tools: toolsLoaded });
+          const toolList = status.info.tool_names || [];
+          setMcpStatus({ online: toolsLoaded > 0, tools: toolsLoaded, toolList });
         } else {
-          // Separate server mode
+          // Separate server mode - fetch tool list
           const mcpHealth = await healthService.checkMcpHealth();
-          setMcpStatus({ online: mcpHealth, tools: mcpHealth ? 5 : 0 });
+          let toolList = [];
+          if (mcpHealth) {
+            try {
+              const response = await fetch('http://localhost:8001/tools');
+              if (response.ok) {
+                const tools = await response.json();
+                toolList = tools.map(t => t.name);
+              }
+            } catch (error) {
+              console.error('Error fetching tools:', error);
+            }
+          }
+          setMcpStatus({ online: mcpHealth, tools: mcpHealth ? toolList.length : 0, toolList });
         }
       }
     };
@@ -98,16 +112,25 @@ function App() {
 
   return (
     <div className="app">
-      <Sidebar 
-        useTools={useTools}
-        onToggleTools={setUseTools}
-        onClearConversation={handleClearConversation}
-        backendStatus={backendStatus}
-        mcpStatus={mcpStatus}
-      />
+      {sidebarVisible && (
+        <Sidebar 
+          useTools={useTools}
+          onToggleTools={setUseTools}
+          onClearConversation={handleClearConversation}
+          backendStatus={backendStatus}
+          mcpStatus={mcpStatus}
+        />
+      )}
       
       <div className="main-content">
         <header className="app-header">
+          <button 
+            className="hamburger-menu"
+            onClick={() => setSidebarVisible(!sidebarVisible)}
+            aria-label="Toggle sidebar"
+          >
+            ☰
+          </button>
           <h1>💬 Chat with OpenAI powered by MCP tools 🔧</h1>
         </header>
         
