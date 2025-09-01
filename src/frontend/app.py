@@ -5,6 +5,7 @@ from datetime import datetime
 from typing import Dict, Any, Optional
 import json
 import logging
+from audio_transcriber import get_transcriber
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -23,6 +24,8 @@ class ChatbotUI:
             st.session_state.conversation_id = None
         if "use_tools" not in st.session_state:
             st.session_state.use_tools = True
+        if "voice_input" not in st.session_state:
+            st.session_state.voice_input = None
     
     async def send_message(self, message: str, use_tools: bool) -> Dict[str, Any]:
         async with httpx.AsyncClient(timeout=60.0) as client:
@@ -137,7 +140,47 @@ class ChatbotUI:
                     message.get("tools_used")
                 )
         
-        if prompt := st.chat_input("Ask me a question about Streamlit's open-source Python library!"):
+        # Voice input section - simplified approach
+        col1, col2 = st.columns([5, 1])
+        
+        with col2:
+            st.markdown("### 🎤 Voice Input")
+            
+            # File uploader for audio files
+            uploaded_audio = st.file_uploader(
+                "Upload audio file",
+                type=["wav", "mp3", "m4a", "webm", "ogg"],
+                help="Record audio with your device and upload it here",
+                key="audio_upload"
+            )
+            
+            if uploaded_audio:
+                st.audio(uploaded_audio, format="audio/wav")
+                if st.button("Transcribe Audio", type="primary"):
+                    st.session_state.voice_input = uploaded_audio.getvalue()
+        
+        # Text input 
+        prompt = st.chat_input("Type your message or upload audio above")
+        
+        # Check for voice input and transcribe
+        if st.session_state.voice_input:
+            transcriber = get_transcriber()
+            if transcriber:
+                with st.spinner("Transcribing audio..."):
+                    # Raw audio bytes
+                    transcribed_text = transcriber.transcribe_audio(st.session_state.voice_input)
+                    
+                    if transcribed_text:
+                        prompt = transcribed_text
+                        st.success(f"📝 Transcribed: {transcribed_text}")
+                    else:
+                        st.error("Failed to transcribe audio. Please try again.")
+            else:
+                st.warning("⚠️ Audio transcription not available. Please ensure OPENAI_API_KEY is set in .env file")
+            
+            st.session_state.voice_input = None
+        
+        if prompt:
             timestamp = datetime.now().strftime("%H:%M:%S")
             
             st.session_state.messages.append({

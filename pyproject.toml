@@ -19,6 +19,11 @@ dependencies = [
     "mcp>=1.0.0",
     "websockets>=14.0",
     "fastmcp>=2.12.0",
+    "streamlit-webrtc>=0.63.4",
+    "openai-whisper>=20250625",
+    "speechrecognition>=3.14.3",
+    "pyaudio>=0.2.14",
+    "audio-recorder-streamlit>=0.0.10",
 ]
 
 
